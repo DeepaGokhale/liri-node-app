@@ -53,35 +53,32 @@ if (parm1 == 'do-what-it-says')
         var command = data.split("\n");
         //get the two parameters action and pick
         parm2 = "'" + parm2 + "'";
+
         for (i=0; i < command.length; i++) {           
             {
-                // set the random pick for the action
-                var arrPick = command[i].split(",");                   
-                // console.log(arrPick[0]);  
+                var arrPick = command[i].split(",");                                    
                 // console.log(parm2);  
                              
                 if(parm2 == arrPick[0])
-                {                                   
-                    console.log("Reached inside " + arrPick[0]);                       
-                    if(arrPick[0] == 'concert-this')
+                {                          
+                    // console.log(i + " " + arrPick[0]);                                                   
+                    if(arrPick[0] == "'concert-this'")
                     {
-                        console.log("cond is true");
-                        var concert = arrPick[1];
-                        concertThis(concert);
+                        concertThis(arrPick[1]);
                     }
 
-                    if(arrPick[0] == 'movie-this')
+                    if(arrPick[0] == "'movie-this'")
                     {
-                        var movie = arrPick[1];
-                        movieThis(movie);
+                        movieThis(arrPick[1]);
                     }
 
-                    if(arrPick[0] == 'spotify-this-song')
+                    if(arrPick[0].split()[0] == "'spotify-this-song'")
                     {
+                            
                         // call spotify function
-                        var track = arrPick[1];
-                        spotifyThis(track);
+                        spotifyThis(arrPick[1]);
                     }
+                     
                 }
             }
         }
@@ -124,7 +121,6 @@ function concertThis(parm2)
                 console.log("location: " + concert.venue.city + "," + concert.venue.region +  " " + concert.venue.country);
                 console.log("latitude, longitude: " + concert.venue.latitude + ", " + concert.venue.longitude);
             });
-
         });
     }
 
