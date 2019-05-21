@@ -6,6 +6,8 @@ var Spotify = require("node-spotify-api");
 var keys = require("./keys.js");
 var spotifyApi = new Spotify(keys.spotify);
 
+//console.log(keys);
+
 var parm1 = process.argv[2];
 var parm2 = process.argv[3];  // currently assuming there are only 2 arguments
 var curDate = new Date();
@@ -25,15 +27,14 @@ if (parm1 == 'concert-this')
     concertThis(parm2);
 }
 
+
 if (parm1 == 'spotify-this-song')
-{
-    var track = process.argv[3];
-    var qURL = "https://api.spotify.com/v1/search?q=" + track + "&type=track";
-    spotifyApi.searchTracks(track)
-        .then(function(data){
-            //play the track
-            console.log("Search by track: " + track, data.body);
-        })
+{    
+    if (parm2 == undefined) // default song "The Sign"
+    {
+        parm2 = "The Sign";
+    }
+    spotifyThis(parm2);
 }
 
 if(parm1 == 'movie-this')
@@ -43,45 +44,75 @@ if(parm1 == 'movie-this')
 
 if (parm1 == 'do-what-it-says')
 {
+    //same stuff called from do what it says - but using the random.txt
     fs.readFile("random.txt", "utf8", function(err, data){
         if (err)
         {
             return console.log(err);
         }
         var command = data.split("\n");
-
-        command.forEach(pick => {
-            var arrPick = pick.split(" ");
-            if(arrPick[0] == parm2)
+        //get the two parameters action and pick
+        parm2 = "'" + parm2 + "'";
+        for (i=0; i < command.length; i++) {           
             {
                 // set the random pick for the action
-                parm2 = arrPick[1];
-                if(arrPick[0] == 'concert-this')
-                {
-                    concertThis(parm2);
-                }
+                var arrPick = command[i].split(",");                   
+                // console.log(arrPick[0]);  
+                // console.log(parm2);  
+                             
+                if(parm2 == arrPick[0])
+                {                                   
+                    console.log("Reached inside " + arrPick[0]);                       
+                    if(arrPick[0] == 'concert-this')
+                    {
+                        console.log("cond is true");
+                        var concert = arrPick[1];
+                        concertThis(concert);
+                    }
 
-                if(arrPick[0] == 'movie-this')
-                {
-                    movieThis(parm2);
-                }
+                    if(arrPick[0] == 'movie-this')
+                    {
+                        var movie = arrPick[1];
+                        movieThis(movie);
+                    }
 
-                if(arrPick[0] == 'spotify-this-song')
-                {
-                    // call spotify function
-                    spotifyThis(parm2);
+                    if(arrPick[0] == 'spotify-this-song')
+                    {
+                        // call spotify function
+                        var track = arrPick[1];
+                        spotifyThis(track);
+                    }
                 }
             }
-        });
-        
-        console.log(command[randomPick]);
+        }
     });
+}
+
+function spotifyThis(track)
+{   
+    //console.log("Reached in SpotifyThis");
+    //Use the Spotify search to look up the track and the information
+    var qURL = "https://api.spotify.com/v1/search?q=" + track + "&type=track";
+    spotifyApi.search({type: 'track', query: track}, function(err, response)
+    {
+        if(err) {
+            return console.log(errr);
+        }
+        else
+        {
+            console.log("Artists: " + response.tracks.items[1].artists[0].name);
+            console.log("Song's name: " + response.tracks.items[1].name);
+            console.log("Album Name: " + response.tracks.items[1].album.name);
+            console.log("Preview Link: " + response.tracks.items[1]. preview_url);
+        }
+    });   
 }
 
 function concertThis(parm2)
 {
     var artist = parm2;
     var qURL = "https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp";
+    //Use the axios search to look up the concert information
     axios.get(qURL)
         .then(function(response){
             //log the info 
@@ -101,6 +132,7 @@ function movieThis(parm2)
 {
     var movieName = parm2;
     var qURL = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=trilogy";
+    //Use the axios search to look up the movie information
     axios.get(qURL)
         .then(function(response){
             //log the info for following
@@ -122,11 +154,4 @@ function movieThis(parm2)
             console.log("Plot: " + movie.Plot);
             console.log("Actors: " + movie.Actors);
         });
-}
-
-function spotifyThis(parm2){
-    {
-        
-        
-    }
 }
