@@ -24,6 +24,10 @@ fs.appendFile("log.txt", log, function(err){
 
 if (parm1 == 'concert-this')
 {
+    if (!parm2)
+    {
+        parm2 = "Lady Gaga";
+    }
     concertThis(parm2);
 }
 
@@ -39,6 +43,10 @@ if (parm1 == 'spotify-this-song')
 
 if(parm1 == 'movie-this')
 {
+    if (!parm2)
+    {
+        parm2 = "Home Alone";
+    }
     movieThis(parm2);
 }
 
